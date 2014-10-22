@@ -22,7 +22,6 @@ var GRAPH_MAX_TIME = 10;
 var GRAPH_FONT_SIZE = 8;
 var GRAPH_WIDTH = (graph.width - (GRAPH_PAD * 2));
 var MATH_PROPS = Object.getOwnPropertyNames(Math);
-console.log(MATH_PROPS.join("|"));
 
 var lastValidEquation, startAnimTime, lastActiveBtn;
 var movementNextPos = graph.height / 2 - box.clientHeight / 2;
