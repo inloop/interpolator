@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Interpolator</title>
+    <meta charset="utf-8">
+    <meta name="description" content="Realtime interpolation equation editor">
+    <meta name="keywords" content="interpolator,interpolation,editor,equation,visualization,custom,graph">
+    <meta name="author" content="Juraj Novák">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="css/style.css" rel="stylesheet">
+    <link href="css/ribbons.min.css" rel="stylesheet">
+</head>
+<body>
+
+
+<div class="box box-placeholder" id="box-placeholder-end" style="display: none; top:310px;"></div>
+<div class="box box-placeholder" id="box-placeholder-start"></div>
+<div class="box" id="box"></div>
+
+<div id="container">
+    <canvas id="graph" width="500" height="500">
+        Sorry, your browser is not supported.
+    </canvas>
+    <div id="tools">
+        <p><b>Equation:</b></p>
+        <div id="editor-parent" class="has-feedback">
+            <div id="editor" class="panel panel-default form-control"></div>
+            <span id="syntax-error-icon" class="glyphicon glyphicon-exclamation-sign form-control-feedback"></span>
+        </div>
+
+        <p>Visualization<span id="remove-vis" style="display: none"> (<a href="javascript:void(0)"
+                                                                         onclick="setBoxAnim(this)">stop</a> or <a
+                href="javascript:void(0)" onclick="reverseAnim()">reverse</a>)</span>:</p>
+
+        <div id="visualization-group" class="btn-group">
+            <button type="button" class="btn btn-default" value="1" onclick="setBoxAnim(this)">Movement</button>
+            <button type="button" class="btn btn-default" value="2" onclick="setBoxAnim(this)">Scaling</button>
+            <button type="button" class="btn btn-default" value="3" onclick="setBoxAnim(this)">Rotation</button>
+            <button type="button" class="btn btn-default" value="4" onclick="setBoxAnim(this)">Alpha</button>
+        </div>
+        <br/><br/>
+
+        <p>Duration:</p>
+
+        <div class="input-group">
+            <input id="delay" class="form-control" type="number" value="2500"/>
+            <span class="input-group-addon">ms</span>
+        </div><br />
+
+        <div class="form-group">
+            <label class="control-label" style="font-weight: normal" for="library">Library:</label>
+            <select onchange="setEquationFromLib()" id="library" class="form-control"></select>
+        </div>
+    </div>
+</div>
+
+<div class="ribbon right grey">
+    <a href="https://github.com/inloop/interpolator">Fork me on GitHub</a>
+</div>
+
+<footer>&copy; 2014, Juraj Novák, <a href="http://inloop.eu/" target="_blank">inloop.eu</a></footer>
+
+<script src="js/bootstrap.min.js"></script>
+<script src="js/ace/ace.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
