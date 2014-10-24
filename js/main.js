@@ -1,6 +1,5 @@
-//Interpolator v0.1 (22.10.2014)
+//Interpolator
 //Written by Juraj Novák, inloop.eu
-//
 
 //Elements
 var graph = document.getElementById("graph");
@@ -31,11 +30,20 @@ var updateDelayId;
 var graphOverflowY = 0;
 
 var EQUATIONS = { list:[
+    {name:"[Basic]", value:null},
     {name:"Linear", value:"x"},
     {name:"Smoothstep", value:"x * x * (3 - 2 * x)"},
     {name:"Spring", value:"factor = 0.4\npow(2, -10 * x) * sin((x - factor / 4) * (2 * PI) / factor) + 1"},
-    {name:"Bounce", value:"//Use javascript syntax to create complex equations\nfunction bounce(t) { return t*t*8; }\n\nif (x < 0.3535)\n bounce(x)\nelse if (x < 0.7408)\n bounce(x - 0.54719) + 0.7\nelse if (x < 0.9644)\n bounce(x - 0.8526) + 0.9\nelse\n bounce(x - 1.0435) + 0.95"}]
-};
+    {name:"[Android]", value:null},
+    {name:"AccelerateDecelerate", value:"(cos((x + 1) * PI) / 2.0) + 0.5"},
+    {name:"Bounce", value:"//Use javascript syntax to create complex equations\nfunction bounce(t) { return t*t*8; }\n\nif (x < 0.3535)\n bounce(x)\nelse if (x < 0.7408)\n bounce(x - 0.54719) + 0.7\nelse if (x < 0.9644)\n bounce(x - 0.8526) + 0.9\nelse\n bounce(x - 1.0435) + 0.95"},
+    {name:"Accelerate", value:"factor = 1.0\nif (factor == 1.0)\n x * x\nelse\n pow(x, 2 * factor)"},
+    {name:"Anticipate", value:"tension = 2.0\nx * x * ((tension + 1) * x - tension)"},
+    {name:"AnticipateOvershoot", value:"tension = 2.0 * 1.5\nfunction a(t,s) { return t * t * ((s + 1) * t - s); }\nfunction o(t,s) { return t * t * ((s + 1) * t + s); }\n\nif (x < 0.5)\n 0.5 * a(x * 2.0, tension)\nelse\n 0.5 * (o(x * 2.0 - 2.0, tension) + 2.0)"},
+    {name:"Cycle", value:"cycles = 1.0\nsin(2 * cycles * PI * x)"},
+    {name:"Decelerate", value:"factor = 1.0\nif (factor == 1.0)\n (1.0 - (1.0 - x) * (1.0 - x))\nelse\n (1.0 - pow((1.0 - x), 2 * factor))"},
+    {name:"Overshoot", value:"tension = 2.0\n\nx -= 1.0\nx * x * ((tension + 1) * x + tension) + 1.0"}
+]};
 
 // --------------------------- //
 
@@ -56,9 +64,16 @@ updateBoxPlaceholders(-1);
 
 //Fill entries in library
 EQUATIONS.list.forEach(function (entry) {
+    var section = (entry.value == null);
     var option = document.createElement("option");
-    option.text = entry.name;
+    option.innerHTML = (!section ? "&nbsp;" : "") + entry.name;
+
     library.add(option);
+
+    if (section) {
+        option.style.color = "#8bc34a";
+        option.disabled = true;
+    }
 });
 
 setEquationFromLib(1);
