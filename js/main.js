@@ -10,9 +10,11 @@ var box = document.getElementById("box");
 var removeVis = document.getElementById("remove-vis");
 var errorIcon = document.getElementById("syntax-error-icon");
 var library = document.getElementById("library");
+var help = document.getElementById("help");
 var ctx = graph.getContext("2d");
 
 //Constants
+var VISUALIZATION = { NONE:0, MOVEMENT: 1, SCALING:2, ROTATION:3, ALPHA:4  };
 var GRAPH_PAD = 40;
 var GRAPH_TEXT_PAD = 5;
 var GRAPH_MAX_Y = 10, GRAPH_MAX_OVERFLOW_TOP = 10;
@@ -25,7 +27,7 @@ var MATH_PROPS = Object.getOwnPropertyNames(Math);
 var lastValidEquation, startAnimTime, lastActiveBtn;
 var movementNextPos = graph.height / 2 - box.clientHeight / 2;
 var isAnimating = false, isReverseAnim = false;
-var currentTestType = -1;
+var currentTestType = VISUALIZATION.NONE;
 var updateDelayId;
 var graphOverflowTop = 0, graphOverflowBottom = 0;
 
@@ -245,7 +247,7 @@ function drawGraph() {
     var overflowToSetTop = 1, overflowToSetBottom = 0;
 
     for (var x = 0; x < GRAPH_WIDTH; x++) {
-        var t = (f(x / GRAPH_WIDTH));
+        var t = (fEval(x / GRAPH_WIDTH));
         var y = -t * getGraphMaxHeight();
         ctx.lineTo(x + GRAPH_PAD + 1, getZeroYPos() + y - 2);
 
@@ -279,7 +281,8 @@ function proxyMathFunctions(text) {
 }
 
 //noinspection JSUnusedLocalSymbols
-function f(x) {
+function fEval(x) {
+    var d = delay.value;
     try {
         var equationData = proxyMathFunctions(editor.getSession().getValue());
         var val = eval(equationData);
@@ -301,7 +304,7 @@ function f(x) {
 
 function drawCurrentPlot(t) {
     ctx.fillStyle = "yellow";
-    var y = -(f(t) * getGraphMaxHeight());
+    var y = -(fEval(t) * getGraphMaxHeight());
     var xPos = (t * GRAPH_WIDTH ) + GRAPH_PAD + 1;
     var yPos = getZeroYPos() + y - 2;
     ctx.fillRect(xPos - 1, yPos - 1, 2, 2);
@@ -332,28 +335,29 @@ function drawBox() {
         drawCurrentPlot(t);
 
         switch (currentTestType) {
-            case 1:
+            case VISUALIZATION.MOVEMENT:
                 var movement = lerp(0, movementNextPos, t);
                 setBoxTransform("translate(0, " + movement + "px)");
                 break;
-            case 2:
+            case VISUALIZATION.SCALING:
                 var scale = lerp(0, 1, t);
                 setBoxTransform("scale(" + scale + ", " + scale + ")");
                 break;
-            case 3:
+            case VISUALIZATION.ROTATION:
                 var deg = lerp(0, 360, t);
                 setBoxTransform("rotate(" + deg + "deg)");
                 break;
-            case 4:
+            case VISUALIZATION.ALPHA:
                 var opacity = lerp(0, 1, t);
                 box.style.opacity = opacity;
                 break;
+            default: // do nothing
         }
     }
 }
 
 function lerp(p1, p2, t) {
-    return (p1 + (p2 - p1)) * f(t);
+    return (p1 + (p2 - p1)) * fEval(t);
 }
 
 function reverseAnim() {
@@ -364,6 +368,7 @@ function reverseAnim() {
 function setBoxTransform(transform) {
     box.style.webkitTransform = transform;
     box.style.transform = transform;
+    box.style.msTransform = transform;
 }
 
 function setBoxAnim(event) {
@@ -393,6 +398,17 @@ function resetBox() {
     startAnimTime = Date.now();
     box.style.opacity = "1";
     setBoxTransform("none");
+}
+
+function toggleHelpBox() {
+    if (help.style.display != "" && help.style.display != "none") {
+        help.style.display = "none";
+    } else {
+        //Show help over canvas
+        help.style.height = graph.height + "px";
+        help.style.left = graph.getBoundingClientRect().left + "px";
+        help.style.display = "inline";
+    }
 }
 
 window.requestAnimFrame = function(){

@@ -21,25 +21,48 @@
 <div class="box" id="box"></div>
 
 <div id="container">
+    <div id="help">
+        <span class="glyphicon glyphicon-remove" onclick="toggleHelpBox()" id="close-help"></span>
+        <h3>Interpolator</h3>
+        <p><i>Realtime interpolation equation WYSIWYG editor</i></p>
+
+        <p>Use JavaScript syntax to create complex equations.</p>
+        <p>Result of equation is evaluated as <b>y</b>
+            (depends on type of visualization: movement = vertical position from X to Y point; scaling = scale X and Y
+            size from 0% to 100%; rotation = degress from 0&deg; to 360&deg;; alpha = opacity from 0% to 100%).
+            Graph can show show <b>y</b> min. -1.0 and max. 2.0</p>
+        <p>Available input variables: <strong>x</strong> = time, <strong>d</strong> = duration</p>
+        You can use all JavaScript Math functions/constants - see list
+        <a href="http://www.w3schools.com/jsref/jsref_obj_math.asp" target="_blank">here</a>.<br />
+        <span class="alert-danger">Use JS math functions without <b>Math.</b></span>!
+
+        <h4>Keyboard shortcuts</h4>
+        <p>Use ALT+ or ALT+SHIFT+ (firefox) or CTRL+ALT+ (mac)</p>
+        <p>
+            <kbd>M</kbd> - movement, <kbd>S</kbd> - scaling, <kbd>R</kbd> - rotation, <kbd>A</kbd> - alpha, <kbd>X</kbd> - stop
+        </p>
+    </div>
+
     <canvas id="graph" width="500" height="500">
         Sorry, your browser is not supported.
     </canvas>
     <div id="tools">
-        <p><b>Equation:</b></p>
+        <p><b>Equation <a href="javascript:void(0)" onclick="toggleHelpBox()">(?)</a>:</b></p>
+
         <div id="editor-parent" class="has-feedback">
             <div id="editor" class="panel panel-default form-control"></div>
             <span id="syntax-error-icon" class="glyphicon glyphicon-exclamation-sign form-control-feedback"></span>
         </div>
 
         <p>Visualization<span id="remove-vis" style="display: none"> (<a href="javascript:void(0)"
-                                                                         onclick="setBoxAnim(this)">stop</a> or <a
+                                                                         onclick="setBoxAnim(this)" accesskey="x">stop</a> or <a
                 href="javascript:void(0)" onclick="reverseAnim()">reverse</a>)</span>:</p>
 
         <div id="visualization-group" class="btn-group">
-            <button type="button" class="btn btn-default" value="1" onclick="setBoxAnim(this)">Movement</button>
-            <button type="button" class="btn btn-default" value="2" onclick="setBoxAnim(this)">Scaling</button>
-            <button type="button" class="btn btn-default" value="3" onclick="setBoxAnim(this)">Rotation</button>
-            <button type="button" class="btn btn-default" value="4" onclick="setBoxAnim(this)">Alpha</button>
+            <button type="button" class="btn btn-default" value="1" accesskey="m" onclick="setBoxAnim(this)">Movement</button>
+            <button type="button" class="btn btn-default" value="2" accesskey="s" onclick="setBoxAnim(this)">Scaling</button>
+            <button type="button" class="btn btn-default" value="3" accesskey="r" onclick="setBoxAnim(this)">Rotation</button>
+            <button type="button" class="btn btn-default" value="4" accesskey="a" onclick="setBoxAnim(this)">Alpha</button>
         </div>
         <br/><br/>
 
@@ -63,7 +86,6 @@
 
 <footer>&copy; 2014, Juraj Novák, <a href="http://inloop.eu/" target="_blank">inloop.eu</a></footer>
 
-<script src="js/bootstrap.min.js"></script>
 <script src="js/ace/ace.js"></script>
 <script src="js/main.js"></script>
 

@@ -34,7 +34,7 @@ footer {
     width: 60px;
     height: 60px;
     position: absolute;
-    z-index: 9999;
+    z-index: 98;
 }
 
 .box-placeholder {
@@ -61,7 +61,7 @@ footer {
     display: none;
     position: absolute;
     top: 125px;
-    z-index: 99
+    z-index: 99;
 }
 
 .ace_editor p, .ace_editor div {
@@ -70,4 +70,24 @@ footer {
 
 .ace_hidden-cursors {
     opacity: 0
+}
+
+#help {
+    background: rgba(255,255,255,0.9);
+    box-shadow: 0 1px 16px silver;
+    position: absolute;
+    text-align: left;
+    left:0;
+    width:500px;
+    word-wrap: break-word;
+    padding: 16px;
+    display: none;
+    z-index: 99;
+}
+
+#close-help {
+    position: absolute;
+    right: 0;
+    padding: 16px;
+    cursor: pointer;
 }
