@@ -300,15 +300,15 @@ function drawBox() {
         switch (currentTestType) {
             case 1:
                 var movement = lerp(0, movementNextPos, t);
-                box.style.transform = "translate(0, " + movement + "px)";
+                setBoxTransform("translate(0, " + movement + "px)");
                 break;
             case 2:
                 var scale = lerp(0, 1, t);
-                box.style.transform = "scale(" + scale + ", " + scale + ")";
+                setBoxTransform("scale(" + scale + ", " + scale + ")");
                 break;
             case 3:
                 var deg = lerp(0, 360, t);
-                box.style.transform = "rotate(" + deg + "deg)";
+                setBoxTransform("rotate(" + deg + "deg)");
                 break;
             case 4:
                 var opacity = lerp(0, 1, t);
@@ -325,6 +325,11 @@ function lerp(p1, p2, t) {
 function reverseAnim() {
     isReverseAnim = !isReverseAnim;
     updateData();
+}
+
+function setBoxTransform(transform) {
+    box.style.webkitTransform = transform;
+    box.style.transform = transform;
 }
 
 function setBoxAnim(event) {
@@ -353,7 +358,7 @@ function setBoxAnim(event) {
 function resetBox() {
     startAnimTime = Date.now();
     box.style.opacity = "1";
-    box.style.transform = "none";
+    setBoxTransform("none");
 }
 
 window.requestAnimFrame = function(){
