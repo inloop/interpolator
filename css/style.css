@@ -49,6 +49,7 @@ footer {
     border: 1px solid #cd1c23;
     max-width: 250px;
     max-height: 250px;
+    -webkit-backface-visibility: hidden;
 }
 
 #editor {
