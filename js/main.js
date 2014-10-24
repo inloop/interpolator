@@ -15,9 +15,9 @@ var ctx = graph.getContext("2d");
 //Constants
 var GRAPH_PAD = 40;
 var GRAPH_TEXT_PAD = 5;
-var GRAPH_MAX_Y = 10;
-var GRAPH_MAX_OVERFLOW_Y = 10;
-var GRAPH_MAX_TIME = 10;
+var GRAPH_MAX_Y = 10, GRAPH_MAX_OVERFLOW_TOP = 10;
+var GRAPH_MIN_Y = 0, GRAPH_MAX_OVERFLOW_BOTTOM = 10;
+var GRAPH_MAX_TIME = 10, GRAPH_MIN_TIME = 0;
 var GRAPH_FONT_SIZE = 8;
 var GRAPH_WIDTH = (graph.width - (GRAPH_PAD * 2));
 var MATH_PROPS = Object.getOwnPropertyNames(Math);
@@ -27,7 +27,7 @@ var movementNextPos = graph.height / 2 - box.clientHeight / 2;
 var isAnimating = false, isReverseAnim = false;
 var currentTestType = -1;
 var updateDelayId;
-var graphOverflowY = 0;
+var graphOverflowTop = 0, graphOverflowBottom = 0;
 
 var EQUATIONS = { list:[
     {name:"[Basic]", value:null},
@@ -149,20 +149,28 @@ function resetFontStyle() {
     ctx.font = GRAPH_FONT_SIZE + "pt verdana";
 }
 
+function getZeroYPos() {
+    return graph.height - GRAPH_PAD - (graphOverflowBottom * getGraphSpaceRow())
+}
+
+function getGraphSpaceRow() {
+    return (graph.height - GRAPH_PAD * 2) / (GRAPH_MAX_Y + graphOverflowTop + graphOverflowBottom);
+}
+
 function drawGrid() {
     ctx.lineWidth = 1;
     ctx.textAlign = "left";
     ctx.strokeStyle = "#e0e0e0";
 
-    var GRAPH_SPACE_ROW = (graph.height - GRAPH_PAD * 2) / (GRAPH_MAX_Y + graphOverflowY);
+    var GRAPH_SPACE_ROW = getGraphSpaceRow();
     var GRAPH_SPACE_COL = (graph.height - GRAPH_PAD * 2) / (GRAPH_MAX_Y);
 
     ctx.beginPath();
-    for (var i = 1; i <= GRAPH_MAX_Y + graphOverflowY; i++) {
-        var isTimeMax = i > GRAPH_MAX_TIME;
+    for (var i = GRAPH_MIN_Y - graphOverflowBottom; i <= GRAPH_MAX_Y + graphOverflowTop; i++) {
+        var isTimeMax =  i < GRAPH_MIN_TIME || i > GRAPH_MAX_TIME;
 
         //Rows
-        var y = graph.height - GRAPH_PAD - (i * GRAPH_SPACE_ROW);
+        var y = getZeroYPos() - (i * GRAPH_SPACE_ROW);
         ctx.moveTo(GRAPH_PAD, y);
         ctx.lineTo(graph.width - GRAPH_PAD, y);
 
@@ -174,11 +182,13 @@ function drawGrid() {
         }
 
         //If Y overflows MaxY - mark max value bold
-        if (graphOverflowY > 0 && i > GRAPH_MAX_Y) {
+        if ((graphOverflowTop > 0 && i > GRAPH_MAX_Y) || (graphOverflowBottom > 0 && i < GRAPH_MIN_Y)) {
             ctx.fillStyle = "red";
+        } else {
+            ctx.fillStyle = "black";
         }
 
-        if (i == GRAPH_MAX_Y) {
+        if (i == GRAPH_MAX_Y || i == 0) {
             ctx.font = "bold " + GRAPH_FONT_SIZE + "pt verdana";
         } else {
             ctx.font = GRAPH_FONT_SIZE + "pt verdana";
@@ -188,8 +198,10 @@ function drawGrid() {
         var legend = (i / 10).toFixed(1);
         var legendWidth = ctx.measureText(legend).width;
         var legendHalfWidth = legendWidth / 2;
-        ctx.fillText(legend.toString(), GRAPH_PAD - GRAPH_TEXT_PAD - legendWidth, y + (GRAPH_FONT_SIZE / 2));
-        if (!isTimeMax) {
+        if (!(i == 0 && graphOverflowBottom == 0)) { // do not draw zero If no Y overflow
+            ctx.fillText(legend.toString(), GRAPH_PAD - GRAPH_TEXT_PAD - legendWidth, y + (GRAPH_FONT_SIZE / 2));
+        }
+        if (!isTimeMax && i != 0) {
             ctx.fillStyle = "black";
             ctx.fillText(legend.toString(), x - legendHalfWidth, graph.height - GRAPH_PAD + GRAPH_FONT_SIZE + GRAPH_TEXT_PAD);
         }
@@ -207,17 +219,18 @@ function drawAxis() {
     ctx.beginPath();
     ctx.moveTo(GRAPH_PAD, GRAPH_PAD);
     ctx.lineTo(GRAPH_PAD, graph.height - GRAPH_PAD);
-    ctx.lineTo(graph.width - GRAPH_PAD, graph.height - GRAPH_PAD);
+    ctx.moveTo(GRAPH_PAD, getZeroYPos());
+    ctx.lineTo(graph.width - GRAPH_PAD, getZeroYPos());
     ctx.fillText("time (x)", GRAPH_PAD + GRAPH_WIDTH / 2, GRAPH_WIDTH + GRAPH_PAD + GRAPH_TEXT_PAD + GRAPH_FONT_SIZE*3);
 
     ctx.stroke();
 }
 
 function getGraphMaxHeight() {
-    var GRAPH_SPACE_ROW = (graph.height - GRAPH_PAD * 2) / (GRAPH_MAX_Y + graphOverflowY);
-    var extraTop = (GRAPH_SPACE_ROW * graphOverflowY);
+    var extraTop = (getGraphSpaceRow() * graphOverflowTop);
+    var extraBottom = (getGraphSpaceRow() * graphOverflowBottom);
 
-    return GRAPH_WIDTH - extraTop;
+    return GRAPH_WIDTH - extraTop - extraBottom;
 }
 
 function drawGraph() {
@@ -226,25 +239,31 @@ function drawGraph() {
 
     ctx.beginPath();
 
-    var maxOverflowY = GRAPH_MAX_OVERFLOW_Y / 10;
-    var maxGraphY = GRAPH_MAX_Y / 10;
-    var overflowToSet = 1;
+    var maxOverflowTop = GRAPH_MAX_OVERFLOW_TOP / 10;
+    var maxOverflowBottom = GRAPH_MAX_OVERFLOW_BOTTOM / 10;
+    var maxGraphTop = GRAPH_MAX_Y / 10;
+    var overflowToSetTop = 1, overflowToSetBottom = 0;
 
     for (var x = 0; x < GRAPH_WIDTH; x++) {
         var t = (f(x / GRAPH_WIDTH));
         var y = -t * getGraphMaxHeight();
-        ctx.lineTo(x + GRAPH_PAD + 1, graph.height - GRAPH_PAD + y - 2);
+        ctx.lineTo(x + GRAPH_PAD + 1, getZeroYPos() + y - 2);
 
-        //Check if y overflows
-        if (t > maxGraphY && t < (maxGraphY + maxOverflowY) && t > overflowToSet) {
-            overflowToSet = t;
+        //Check if y overflows top or bottom value
+        if (t > maxGraphTop && t <= (maxGraphTop + maxOverflowTop) && t > overflowToSetTop) {
+            overflowToSetTop = t;
+        } else if (t < GRAPH_MIN_Y && t >= GRAPH_MIN_Y - maxOverflowBottom && t < overflowToSetBottom) {
+            overflowToSetBottom = t;
         }
     }
 
     //Resize grid/graph If overflows
-    var overflowRelative = Math.ceil(Math.abs((maxGraphY - overflowToSet) * 10));
-    if (overflowRelative != graphOverflowY) {
-        graphOverflowY = overflowRelative;
+    var overflowRelativeTop = Math.ceil(Math.abs((maxGraphTop - overflowToSetTop) * 10));
+    var overflowRelativeBottom = Math.ceil(Math.abs((GRAPH_MIN_Y - overflowToSetBottom) * 10));
+
+    if (overflowRelativeTop != graphOverflowTop || overflowRelativeBottom != graphOverflowBottom) {
+        graphOverflowTop = overflowRelativeTop;
+        graphOverflowBottom = overflowRelativeBottom;
         drawAll();
         return;
     }
@@ -284,7 +303,7 @@ function drawCurrentPlot(t) {
     ctx.fillStyle = "yellow";
     var y = -(f(t) * getGraphMaxHeight());
     var xPos = (t * GRAPH_WIDTH ) + GRAPH_PAD + 1;
-    var yPos = graph.height - GRAPH_PAD + y - 2;
+    var yPos = getZeroYPos() + y - 2;
     ctx.fillRect(xPos - 1, yPos - 1, 2, 2);
 }
 
