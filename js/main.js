@@ -47,6 +47,11 @@ var EQUATIONS = { list:[
     {name:"Overshoot", value:"tension = 2.0\n\nx -= 1.0\nx * x * ((tension + 1) * x + tension) + 1.0"}
 ]};
 
+String.prototype.replaceAll = function(search, replacement) {
+    var target = this;
+    return target.replace(new RegExp(search, 'g'), replacement);
+};
+
 // --------------------------- //
 
 //Initialize editor
@@ -274,8 +279,10 @@ function drawGraph() {
 }
 
 function proxyMathFunctions(text) {
+    if (text.length == 0) return text;
+
     for(var i in MATH_PROPS){
-        text = text.replace(MATH_PROPS[i], "Math." + MATH_PROPS[i]);
+        text = text.replaceAll(MATH_PROPS[i], "Math." + MATH_PROPS[i]);
     }
     return text;
 }
