@@ -44,7 +44,9 @@ var EQUATIONS = { list:[
     {name:"AnticipateOvershoot", value:"tension = 2.0 * 1.5\nfunction a(t,s) { return t * t * ((s + 1) * t - s); }\nfunction o(t,s) { return t * t * ((s + 1) * t + s); }\n\nif (x < 0.5)\n 0.5 * a(x * 2.0, tension)\nelse\n 0.5 * (o(x * 2.0 - 2.0, tension) + 2.0)"},
     {name:"Cycle", value:"cycles = 1.0\nsin(2 * cycles * PI * x)"},
     {name:"Decelerate", value:"factor = 1.0\nif (factor == 1.0)\n (1.0 - (1.0 - x) * (1.0 - x))\nelse\n (1.0 - pow((1.0 - x), 2 * factor))"},
-    {name:"Overshoot", value:"tension = 2.0\n\nx -= 1.0\nx * x * ((tension + 1) * x + tension) + 1.0"}
+    {name:"Overshoot", value:"tension = 2.0\n\nx -= 1.0\nx * x * ((tension + 1) * x + tension) + 1.0"},
+    {name:"[Advanced]", value:null},
+    {name:"CubicHermite", value:"function CubicHermite(t, p0, p1, m0, m1){\n   t2 = t*t;\n   t3 = t2*t;\n   return (2*t3 - 3*t2 + 1)*p0 + (t3-2*t2+t)*m0 + (-2*t3+3*t2)*p1 + (t3-t2)*m1;\n}\n\n//time, start, end, tangent0, tangent1\n//modify tangent0 and tangent1\nCubicHermite(x, 0, 1, 4, 4)"}
 ]};
 
 String.prototype.replaceAll = function(search, replacement) {
@@ -122,13 +124,13 @@ function updateBoxPlaceholders(type) {
     for (var i = 0; i < elements.length; i++) {
         elements[i].style.left = boxCenterPos;
     }
-    if (type == 4) {
+    if (type == VISUALIZATION.ALPHA) {
         placeHolderStart.style.display = "none";
     } else {
         placeHolderStart.style.display = "block";
     }
 
-    if (type == 1) {
+    if (type == VISUALIZATION.MOVEMENT) {
         placeHolderEnd.style.top = (movementNextPos + box.clientHeight) + "px";
         placeHolderEnd.style.display = "block";
     } else {
