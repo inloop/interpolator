@@ -6,7 +6,13 @@ body {
 
 footer {
     margin-top: 8px;
+    margin-bottom: 8px;
     color: darkgray;
+    text-align: center;
+}
+
+footer small a {
+    color: #7AA7CF;
 }
 
 #container {
