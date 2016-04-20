@@ -56,9 +56,10 @@
             <span id="syntax-error-icon" class="glyphicon glyphicon-exclamation-sign form-control-feedback"></span>
         </div>
 
-        <p>Visualization<span id="remove-vis" style="display: none"> (<a href="javascript:void(0)"
-                                                                         onclick="setBoxAnim(this)" accesskey="x">stop</a> or <a
-                href="javascript:void(0)" onclick="reverseAnim()">reverse</a>)</span>:</p>
+        <p>Visualization:<span id="remove-vis" style="display: none">
+            <a href="javascript:void(0)" onclick="setBoxAnim(this)" class="no-underline" accesskey="x"><span class="glyphicon glyphicon-stop" aria-hidden="true"></span> Stop</a>&nbsp;
+            <a href="javascript:void(0)" onclick="changeAnimMode()" class="no-underline"><span class="glyphicon glyphicon-repeat" aria-hidden="true"></span> <span id="anim-mode">Normal mode</span></a>
+        </span></p>
 
         <div id="visualization-group" class="btn-group">
             <button type="button" class="btn btn-default" value="1" accesskey="m" onclick="setBoxAnim(this)">Movement</button>
@@ -88,13 +89,13 @@
 
 <div class="container">
     <footer>
-        &copy; 2014, Juraj Novák, <a href="http://inloop.eu/" target="_blank">inloop.eu</a><br>
+        &copy; 2016, Juraj Novák, <a href="http://inloop.eu/" target="_blank">inloop.eu</a><br>
         <small>| <a href="http://inloop.github.io/">other projects</a> |</small>
     </footer>
 </div>
 
 <script src="js/ace/ace.js"></script>
-<script src="js/main.js"></script>
+<script src="js/main.js?v=2"></script>
 
 <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

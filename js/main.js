@@ -11,10 +11,12 @@ var removeVis = document.getElementById("remove-vis");
 var errorIcon = document.getElementById("syntax-error-icon");
 var library = document.getElementById("library");
 var help = document.getElementById("help");
+var animModeText = document.getElementById("anim-mode");
 var ctx = graph.getContext("2d");
 
 //Constants
-var VISUALIZATION = { NONE:0, MOVEMENT: 1, SCALING:2, ROTATION:3, ALPHA:4  };
+var VISUALIZATION = { NONE:0, MOVEMENT: 1, SCALING:2, ROTATION:3, ALPHA:4 };
+var ANIMATION_MODE = { NORMAL: "Normal", REVERSE: "Reverse", PINGPONG: "PingPong" };
 var GRAPH_PAD = 40;
 var GRAPH_TEXT_PAD = 5;
 var GRAPH_MAX_Y = 10, GRAPH_MAX_OVERFLOW_TOP = 10;
@@ -26,10 +28,13 @@ var MATH_PROPS = Object.getOwnPropertyNames(Math);
 
 var lastValidEquation, startAnimTime, lastActiveBtn;
 var movementNextPos = graph.height / 2 - box.clientHeight / 2;
-var isAnimating = false, isReverseAnim = false;
+var isAnimating = false;
 var currentTestType = VISUALIZATION.NONE;
 var updateDelayId;
 var graphOverflowTop = 0, graphOverflowBottom = 0;
+var animMode = ANIMATION_MODE.NORMAL;
+var animReversed = false;
+var lastCachedEquation, lastCachedEquationReplaced;
 
 var EQUATIONS = { list:[
     {name:"[Basic]", value:null},
@@ -283,9 +288,18 @@ function drawGraph() {
 function proxyMathFunctions(text) {
     if (text.length == 0) return text;
 
+    if (lastCachedEquation == text) {
+        return lastCachedEquationReplaced;
+    }
+
+    lastCachedEquation = text;
+
     for(var i in MATH_PROPS){
         text = text.replaceAll(MATH_PROPS[i], "Math." + MATH_PROPS[i]);
     }
+
+    lastCachedEquationReplaced = text;
+
     return text;
 }
 
@@ -335,7 +349,15 @@ function drawBox() {
     }
 
     var t = (Date.now() - startAnimTime) / delayVal;
-    t = isReverseAnim ? 1.0 - t : t;
+
+    if (animMode == ANIMATION_MODE.REVERSE) {
+        t = 1.0 - t;
+    } else if (animMode == ANIMATION_MODE.PINGPONG) {
+        if (t > 1.0) {
+            animReversed = !animReversed;
+        }
+        t = animReversed ? 1.0 - t : t;
+    }
 
     if (t > 1.0 || t < 0) {
         updateData();
@@ -369,8 +391,15 @@ function lerp(p1, p2, t) {
     return (p1 + (p2 - p1)) * fEval(t);
 }
 
-function reverseAnim() {
-    isReverseAnim = !isReverseAnim;
+function changeAnimMode() {
+    if (animMode == ANIMATION_MODE.NORMAL) {
+        animMode = ANIMATION_MODE.REVERSE;
+    } else if (animMode == ANIMATION_MODE.REVERSE) {
+        animMode = ANIMATION_MODE.PINGPONG;
+    } else {
+        animMode = ANIMATION_MODE.NORMAL;
+    }
+    animModeText.innerHTML = animMode;
     updateData();
 }
 
@@ -389,11 +418,14 @@ function setBoxAnim(event) {
     if (typeof event.value === "undefined") {
         setAnimationEnabled(false);
         resetBox();
-        isReverseAnim = false;
+        animMode = ANIMATION_MODE.NORMAL;
+        animModeText.innerHTML = animMode;
+        animReversed = false;
         removeVis.style.display = "none";
         updateBoxPlaceholders(0);
     } else {
         currentTestType = parseInt(event.value);
+        animReversed = false;
         event.classList.add("active");
         event.classList.add("btn-primary");
         lastActiveBtn = event;

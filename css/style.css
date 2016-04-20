@@ -78,6 +78,10 @@ footer small a {
     opacity: 0
 }
 
+.no-underline {
+    text-decoration: none !important;
+}
+
 #help {
     background: rgba(255,255,255,0.9);
     box-shadow: 0 1px 16px silver;
