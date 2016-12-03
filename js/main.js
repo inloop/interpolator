@@ -23,11 +23,12 @@ var GRAPH_MAX_Y = 10, GRAPH_MAX_OVERFLOW_TOP = 10;
 var GRAPH_MIN_Y = 0, GRAPH_MAX_OVERFLOW_BOTTOM = 10;
 var GRAPH_MAX_TIME = 10, GRAPH_MIN_TIME = 0;
 var GRAPH_FONT_SIZE = 8;
-var GRAPH_WIDTH = (graph.width - (GRAPH_PAD * 2));
 var MATH_PROPS = Object.getOwnPropertyNames(Math);
+var TOTAL_WIDTH = 500, TOTAL_HEIGHT = 500;
+var GRAPH_WIDTH = (TOTAL_WIDTH - (GRAPH_PAD * 2));
 
 var lastValidEquation, startAnimTime, lastActiveBtn;
-var movementNextPos = graph.height / 2 - box.clientHeight / 2;
+var movementNextPos = TOTAL_HEIGHT / 2 - box.clientHeight / 2;
 var isAnimating = false;
 var currentTestType = VISUALIZATION.NONE;
 var updateDelayId;
@@ -150,7 +151,7 @@ function updateData() {
 }
 
 function drawAll() {
-    ctx.clearRect(0, 0, graph.width, graph.height);
+    ctx.clearRect(0, 0, TOTAL_WIDTH, TOTAL_HEIGHT);
     resetFontStyle();
 
     drawGrid();
@@ -164,11 +165,11 @@ function resetFontStyle() {
 }
 
 function getZeroYPos() {
-    return graph.height - GRAPH_PAD - (graphOverflowBottom * getGraphSpaceRow())
+    return TOTAL_HEIGHT - GRAPH_PAD - (graphOverflowBottom * getGraphSpaceRow())
 }
 
 function getGraphSpaceRow() {
-    return (graph.height - GRAPH_PAD * 2) / (GRAPH_MAX_Y + graphOverflowTop + graphOverflowBottom);
+    return (TOTAL_HEIGHT - GRAPH_PAD * 2) / (GRAPH_MAX_Y + graphOverflowTop + graphOverflowBottom);
 }
 
 function drawGrid() {
@@ -177,7 +178,7 @@ function drawGrid() {
     ctx.strokeStyle = "#e0e0e0";
 
     var GRAPH_SPACE_ROW = getGraphSpaceRow();
-    var GRAPH_SPACE_COL = (graph.height - GRAPH_PAD * 2) / (GRAPH_MAX_Y);
+    var GRAPH_SPACE_COL = (TOTAL_HEIGHT - GRAPH_PAD * 2) / (GRAPH_MAX_Y);
 
     ctx.beginPath();
     for (var i = GRAPH_MIN_Y - graphOverflowBottom; i <= GRAPH_MAX_Y + graphOverflowTop; i++) {
@@ -186,12 +187,12 @@ function drawGrid() {
         //Rows
         var y = getZeroYPos() - (i * GRAPH_SPACE_ROW);
         ctx.moveTo(GRAPH_PAD, y);
-        ctx.lineTo(graph.width - GRAPH_PAD, y);
+        ctx.lineTo(TOTAL_WIDTH - GRAPH_PAD, y);
 
         //Cols
         var x = (i * GRAPH_SPACE_COL) - 1 + GRAPH_PAD;
         if (!isTimeMax) {
-            ctx.moveTo(x, graph.height - GRAPH_PAD);
+            ctx.moveTo(x, TOTAL_HEIGHT - GRAPH_PAD);
             ctx.lineTo(x, GRAPH_PAD);
         }
 
@@ -217,7 +218,7 @@ function drawGrid() {
         }
         if (!isTimeMax && i != 0) {
             ctx.fillStyle = "black";
-            ctx.fillText(legend.toString(), x - legendHalfWidth, graph.height - GRAPH_PAD + GRAPH_FONT_SIZE + GRAPH_TEXT_PAD);
+            ctx.fillText(legend.toString(), x - legendHalfWidth, TOTAL_HEIGHT - GRAPH_PAD + GRAPH_FONT_SIZE + GRAPH_TEXT_PAD);
         }
     }
     ctx.stroke();
@@ -232,9 +233,9 @@ function drawAxis() {
 
     ctx.beginPath();
     ctx.moveTo(GRAPH_PAD, GRAPH_PAD);
-    ctx.lineTo(GRAPH_PAD, graph.height - GRAPH_PAD);
+    ctx.lineTo(GRAPH_PAD, TOTAL_HEIGHT - GRAPH_PAD);
     ctx.moveTo(GRAPH_PAD, getZeroYPos());
-    ctx.lineTo(graph.width - GRAPH_PAD, getZeroYPos());
+    ctx.lineTo(TOTAL_WIDTH - GRAPH_PAD, getZeroYPos());
     ctx.fillText("time (x)", GRAPH_PAD + GRAPH_WIDTH / 2, GRAPH_WIDTH + GRAPH_PAD + GRAPH_TEXT_PAD + GRAPH_FONT_SIZE*3);
 
     ctx.stroke();
@@ -446,7 +447,7 @@ function toggleHelpBox() {
         help.style.display = "none";
     } else {
         //Show help over canvas
-        help.style.height = graph.height + "px";
+        help.style.height = TOTAL_HEIGHT + "px";
         help.style.left = graph.getBoundingClientRect().left + "px";
         help.style.display = "inline";
     }
